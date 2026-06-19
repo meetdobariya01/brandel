@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { FaWhatsapp } from "react-icons/fa";
 import "./home.css";
 
 const Home = () => {
@@ -207,7 +208,7 @@ const Home = () => {
     try {
       // Get API URL from environment or use default
       const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5175";
-      
+
       const response = await fetch(`${API_URL}/api/waitlist`, {
         method: "POST",
         headers: {
@@ -254,7 +255,7 @@ const Home = () => {
             }
           });
           setErrors(newErrors);
-          
+
           const modal = document.querySelector(".modal-content");
           if (modal) {
             modal.classList.add("shake");
@@ -266,9 +267,7 @@ const Home = () => {
       }
     } catch (error) {
       console.error("Submission error:", error);
-      setApiError(
-        "Network error. Please check your connection and try again."
-      );
+      setApiError("Network error. Please check your connection and try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -305,7 +304,7 @@ const Home = () => {
       <div className="glow-effect glow-bottom-right" aria-hidden="true" />
 
       {/* Header Area */}
-      <header className="page-header animate-fade-in-down">
+      {/* <header className="page-header animate-fade-in-down">
         <div className="logo-wrapper">
           <img
             src="./images/brandel.png"
@@ -313,11 +312,20 @@ const Home = () => {
             className="brand-logo w-50"
           />
         </div>
-      </header>
+      </header> */}
 
       {/* Main Hero Card Container */}
       <main className="main-content-area">
         <section className="coming-soon-card animate-fade-in-up">
+          <header className="page-header animate-fade-in-down">
+            <div className="logo-wrapper">
+              <img
+                src="./images/brandel.png"
+                alt="Brandel Logo"
+                className="brand-logo w-50"
+              />
+            </div>
+          </header>
           {/* Badge */}
           <div className="badge-pill">
             <span className="badge-dot" />
@@ -375,7 +383,7 @@ const Home = () => {
           </div>
 
           {/* Email notify form */}
-          <form className="email-notify-row" onSubmit={handleMainSubmit}>
+          {/* <form className="email-notify-row" onSubmit={handleMainSubmit}>
             <input
               type="email"
               placeholder="Enter your email address"
@@ -401,9 +409,9 @@ const Home = () => {
                 <polyline points="12 5 19 12 12 19" />
               </svg>
             </button>
-          </form>
+          </form> */}
 
-          <div className="direct-cta-wrapper">
+          {/* <div className="direct-cta-wrapper">
             <button
               type="button"
               className="text-cta-button"
@@ -414,7 +422,16 @@ const Home = () => {
                 Join the Brandel Waiting List
               </span>
             </button>
-          </div>
+          </div> */}
+          <a
+            href="https://wa.me/919999999999?text=Hello%20I%20would%20like%20to%20apply%20for%20an%20invitation."
+            target="_blank"
+            rel="noopener noreferrer"
+            className="whatsapp-btn"
+          >
+            <FaWhatsapp />
+            Connect in WhatsApp
+          </a>
         </section>
 
         {/* Why Join Brandel Highlight Section (Bottom of Page) */}
@@ -537,6 +554,15 @@ const Home = () => {
                 <path d="M12 2l2.4 5.2 5.6 1.8-4.2 4 1.2 5.7-5-3.2-5 3.2 1.2-5.7-4.2-4 5.6-1.8z" />
               </svg>
             </button>
+            {/* <a
+              href="https://wa.me/919999999999?text=Hello%20I%20would%20like%20to%20apply%20for%20an%20invitation."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="whatsapp-btn"
+            >
+              <FaWhatsapp />
+              
+            </a> */}
           </div>
         </section>
       </main>

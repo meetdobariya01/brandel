@@ -995,6 +995,36 @@
   animation: zoomIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+.invitation-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.whatsapp-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 22px;
+  border-radius: 14px;
+  background: #25d366;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.whatsapp-btn:hover {
+  transform: translateY(-3px);
+  background: #1ebe5d;
+  color: #fff;
+}
+
+.whatsapp-btn i {
+  font-size: 22px;
+}
 @keyframes fadeInDown {
   from {
     opacity: 0;
