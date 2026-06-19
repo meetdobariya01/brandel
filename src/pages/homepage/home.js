@@ -207,8 +207,13 @@ const Home = () => {
 
     try {
       // Get API URL from environment or use default
+<<<<<<< HEAD
       const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5175";
 
+=======
+      const API_URL = "https://api.brandel.shop"; // Replace with your actual backend API URL
+      
+>>>>>>> dbd806db2c109b45e239a85886987fb987e6f83a
       const response = await fetch(`${API_URL}/api/waitlist`, {
         method: "POST",
         headers: {
@@ -316,6 +321,128 @@ const Home = () => {
 
       {/* Main Hero Card Container */}
       <main className="main-content-area">
+<<<<<<< HEAD
+=======
+        <section className="coming-soon-card animate-fade-in-up">
+          <header className="page-header animate-fade-in-down">
+            <div className="logo-wrapper">
+              <img
+                src="./images/brandel.png"
+                alt="Brandel Logo"
+                className="brand-logo w-50"
+              />
+            </div>
+          </header>
+          {/* Badge */}
+          <div className="badge-pill">
+            <span className="badge-dot" />
+            <span className="badge-text">CURATING HOMEGROWN EXCELLENCE</span>
+          </div>
+
+          {/* Heading */}
+          <h2 className="hero-title">
+            Something Extraordinary is
+            <span className="under-construction-text">Under Construction</span>
+          </h2>
+
+          {/* Subtitle */}
+          <p className="hero-subtitle">
+            We are busy creating a premium marketplace for the finest Brandel
+            experiences. Leave your email to receive an exclusive invitation to
+            our private launch event.
+          </p>
+
+          {/* Countdown Clock Grid */}
+          <div className="countdown-grid">
+            <div className="countdown-item-box">
+              <span className="countdown-number">
+                {formatTime(timeLeft.days)}
+              </span>
+              <span className="countdown-label">DAYS</span>
+            </div>
+
+            <div className="countdown-colon">:</div>
+
+            <div className="countdown-item-box">
+              <span className="countdown-number">
+                {formatTime(timeLeft.hours)}
+              </span>
+              <span className="countdown-label">HOURS</span>
+            </div>
+
+            <div className="countdown-colon">:</div>
+
+            <div className="countdown-item-box">
+              <span className="countdown-number">
+                {formatTime(timeLeft.minutes)}
+              </span>
+              <span className="countdown-label">MINS</span>
+            </div>
+
+            <div className="countdown-colon">:</div>
+
+            <div className="countdown-item-box">
+              <span className="countdown-number">
+                {formatTime(timeLeft.seconds)}
+              </span>
+              <span className="countdown-label">SECS</span>
+            </div>
+          </div>
+
+          {/* Email notify form */}
+          {/* <form className="email-notify-row" onSubmit={handleMainSubmit}>
+            <input
+              type="email"
+              placeholder="Enter your email address"
+              className="main-email-input"
+              value={mainEmail}
+              onChange={(e) => setMainEmail(e.target.value)}
+              aria-label="Email address for waiting list"
+            />
+            <button type="submit" className="main-notify-button">
+              <span>Notify Me</span>
+              <svg
+                className="arrow-icon"
+                viewBox="0 0 24 24"
+                width="16"
+                height="16"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </button>
+          </form> */}
+
+          {/* <div className="direct-cta-wrapper">
+            <button
+              type="button"
+              className="text-cta-button"
+              onClick={() => handleOpenModal()}
+            >
+              Or apply directly:{" "}
+              <span className="cta-highlight">
+                Join the Brandel Waiting List
+              </span>
+            </button>
+          </div> */}
+          <a
+            href="https://wa.me/917016929807?text=Hello%20I%20would%20like%20to%20apply%20for%20an%20invitation."
+            target="_blank"
+            rel="noopener noreferrer"
+            className="whatsapp-btn"
+          >
+            <FaWhatsapp />
+            Connect in WhatsApp
+          </a>
+        </section>
+
+        {/* Why Join Brandel Highlight Section (Bottom of Page) */}
+>>>>>>> dbd806db2c109b45e239a85886987fb987e6f83a
         <section className="why-join-section animate-fade-in-up-delay">
           <div className="why-join-header">
             <h3 className="section-title">Why Join Brandel?</h3>
