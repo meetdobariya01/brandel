@@ -206,7 +206,7 @@ const Home = () => {
 
     try {
       // Get API URL from environment or use default
-      const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5175";
+      const API_URL = "https://api.brandel.shop";
       
       const response = await fetch(`${API_URL}/api/waitlist`, {
         method: "POST",
