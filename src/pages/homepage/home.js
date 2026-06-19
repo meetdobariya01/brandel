@@ -53,7 +53,7 @@ const Home = () => {
 
   // Timer logic: target date August 1, 2026
   useEffect(() => {
-    const targetDate = new Date("2026-08-01T00:00:00").getTime();
+    const targetDate = new Date("2026-08-15T00:00:00").getTime();
 
     const updateTimer = () => {
       const now = new Date().getTime();

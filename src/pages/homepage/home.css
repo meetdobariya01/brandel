@@ -95,7 +95,7 @@
   align-items: center;
 }
 .logo-wrapper img {
-  width: 130px;
+  width: 50%;
   height: auto;
   margin-bottom: -10px;
   filter: drop-shadow(0 4px 8px rgba(6, 45, 31, 0.05));
