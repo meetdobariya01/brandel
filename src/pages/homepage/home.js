@@ -210,7 +210,7 @@ const Home = () => {
       const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5175";
 
       // const API_URL = "https://api.brandel.shop";
-      
+
       const response = await fetch(`${API_URL}/api/waitlist`, {
         method: "POST",
         headers: {
@@ -319,136 +319,7 @@ const Home = () => {
       {/* Main Hero Card Container */}
       <main className="main-content-area">
         {/* Why Join Brandel Highlight Section (Bottom of Page) */}
-        <section className="why-join-section animate-fade-in-up-delay">
-          <div className="why-join-header">
-            <h3 className="section-title">Why Join Brandel?</h3>
-            <div className="section-divider" />
-          </div>
 
-          <div className="benefits-grid">
-            <div className="benefit-card">
-              <span className="check-icon-wrapper">
-                <svg
-                  className="check-svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-              </span>
-              <span className="benefit-text">Invite-only marketplace</span>
-            </div>
-
-            <div className="benefit-card">
-              <span className="check-icon-wrapper">
-                <svg
-                  className="check-svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-              </span>
-              <span className="benefit-text">Curated to maintain quality</span>
-            </div>
-
-            <div className="benefit-card">
-              <span className="check-icon-wrapper">
-                <svg
-                  className="check-svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-              </span>
-              <span className="benefit-text">
-                Better visibility for selected brands
-              </span>
-            </div>
-
-            <div className="benefit-card">
-              <span className="check-icon-wrapper">
-                <svg
-                  className="check-svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-              </span>
-              <span className="benefit-text">
-                Founding Seller benefits available
-              </span>
-            </div>
-
-            <div className="benefit-card">
-              <span className="check-icon-wrapper">
-                <svg
-                  className="check-svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-              </span>
-              <span className="benefit-text">Limited onboarding slots</span>
-            </div>
-          </div>
-
-          <div className="invitation-footer-card">
-            <h4 className="invitation-title">Apply for Invitation</h4>
-            <p className="invitation-description">
-              Applications are reviewed manually. Selected brands will receive
-              an invitation link to complete onboarding before August 2026.
-            </p>
-            <button
-              type="button"
-              className="apply-invitation-btn"
-              onClick={() => handleOpenModal()}
-            >
-              <span>Apply for Invitation</span>
-              <svg
-                className="btn-sparkle"
-                viewBox="0 0 24 24"
-                width="18"
-                height="18"
-                fill="currentColor"
-              >
-                <path d="M12 2l2.4 5.2 5.6 1.8-4.2 4 1.2 5.7-5-3.2-5 3.2 1.2-5.7-4.2-4 5.6-1.8z" />
-              </svg>
-            </button>
-            {/* <a
-              href="https://wa.me/919999999999?text=Hello%20I%20would%20like%20to%20apply%20for%20an%20invitation."
-              target="_blank"
-              rel="noopener noreferrer"
-              className="whatsapp-btn"
-            >
-              <FaWhatsapp />
-              
-            </a> */}
-          </div>
-        </section>
         <section className="coming-soon-card animate-fade-in-up">
           <header className="page-header animate-fade-in-down">
             {/* <div className="logo-wrapper">
@@ -556,6 +427,138 @@ const Home = () => {
               </span>
             </button>
           </div> */}
+
+          <div className="invitation-footer-card">
+            <h4 className="invitation-title">Apply for Invitation</h4>
+            <p className="invitation-description">
+              Applications are reviewed manually. Selected brands will receive
+              an invitation link to complete onboarding before August 2026.
+            </p>
+            <button
+              type="button"
+              className="apply-invitation-btn"
+              onClick={() => handleOpenModal()}
+            >
+              <span>Apply for Invitation</span>
+              <svg
+                className="btn-sparkle"
+                viewBox="0 0 24 24"
+                width="18"
+                height="18"
+                fill="currentColor"
+              >
+                <path d="M12 2l2.4 5.2 5.6 1.8-4.2 4 1.2 5.7-5-3.2-5 3.2 1.2-5.7-4.2-4 5.6-1.8z" />
+              </svg>
+            </button>
+            {/* <a
+              href="https://wa.me/919999999999?text=Hello%20I%20would%20like%20to%20apply%20for%20an%20invitation."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="whatsapp-btn"
+            >
+              <FaWhatsapp />
+              
+            </a> */}
+          </div>
+        </section>
+
+        <section className="why-join-section animate-fade-in-up-delay">
+          <div className="why-join-header">
+            <h3 className="section-title">Why Join Brandel?</h3>
+            <div className="section-divider" />
+          </div>
+
+          <div className="benefits-grid">
+            <div className="benefit-card">
+              <span className="check-icon-wrapper">
+                <svg
+                  className="check-svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </span>
+              <span className="benefit-text">Invite-only marketplace</span>
+            </div>
+
+            <div className="benefit-card">
+              <span className="check-icon-wrapper">
+                <svg
+                  className="check-svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </span>
+              <span className="benefit-text">Curated to maintain quality</span>
+            </div>
+
+            <div className="benefit-card">
+              <span className="check-icon-wrapper">
+                <svg
+                  className="check-svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </span>
+              <span className="benefit-text">
+                Better visibility for selected brands
+              </span>
+            </div>
+
+            <div className="benefit-card">
+              <span className="check-icon-wrapper">
+                <svg
+                  className="check-svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </span>
+              <span className="benefit-text">
+                Founding Seller benefits available
+              </span>
+            </div>
+
+            <div className="benefit-card">
+              <span className="check-icon-wrapper">
+                <svg
+                  className="check-svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </span>
+              <span className="benefit-text">Limited onboarding slots</span>
+            </div>
+          </div>
+
           <a
             href="https://wa.me/919999999999?text=Hello%20I%20would%20like%20to%20apply%20for%20an%20invitation."
             target="_blank"
