@@ -33,6 +33,7 @@ const Home = () => {
   const [isSuccess, setIsSuccess] = useState(false);
   const [submittedBrand, setSubmittedBrand] = useState("");
   const [submittedEmail, setSubmittedEmail] = useState("");
+  const [apiError, setApiError] = useState("");
 
   // Floating particles array
   const [particles, setParticles] = useState([]);
@@ -99,15 +100,16 @@ const Home = () => {
     }));
     setIsModalOpen(true);
     setErrors({});
+    setApiError("");
   };
 
   // Close modal and reset state
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    // Keep success state for a moment or reset after closing animation
     setTimeout(() => {
       setIsSuccess(false);
       setErrors({});
+      setApiError("");
     }, 400);
   };
 
@@ -133,10 +135,10 @@ const Home = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    // Clear field-specific error as user types
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: null }));
     }
+    if (apiError) setApiError("");
   };
 
   // Main page notify button click handler
@@ -171,7 +173,6 @@ const Home = () => {
     if (!formData.mobile.trim()) {
       tempErrors.mobile = "Mobile Number is required";
     } else {
-      // Basic check for valid phone characters: digits, spaces, dashes, parentheses, optional leading plus
       const phoneRegex = /^(\+?\d{1,3}[- ]?)?\d{8,14}$/;
       if (!phoneRegex.test(formData.mobile.replace(/\s+/g, ""))) {
         tempErrors.mobile =
@@ -187,12 +188,11 @@ const Home = () => {
     return Object.keys(tempErrors).length === 0;
   };
 
-  // Handle Waitlist Form submission
-  const handleFormSubmit = (e) => {
+  // Handle Waitlist Form submission with backend API
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
 
     if (!validateForm()) {
-      // Trigger a shake effect on the modal
       const modal = document.querySelector(".modal-content");
       if (modal) {
         modal.classList.add("shake");
@@ -202,39 +202,76 @@ const Home = () => {
     }
 
     setIsSubmitting(true);
+    setApiError("");
 
-    // Simulate API network request (1.5 seconds)
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setIsSuccess(true);
-      setSubmittedBrand(formData.brandName);
-      setSubmittedEmail(formData.email);
-
-      // Save submission locally
-      const existingLeads = JSON.parse(
-        localStorage.getItem("brandel_waitlist") || "[]",
-      );
-      const newLead = {
-        ...formData,
-        submittedAt: new Date().toISOString(),
-      };
-      localStorage.setItem(
-        "brandel_waitlist",
-        JSON.stringify([...existingLeads, newLead]),
-      );
-
-      // Reset form fields
-      setFormData({
-        brandName: "",
-        yourName: "",
-        email: "",
-        mobile: "",
-        website: "",
-        category: "",
-        aboutBrand: "",
+    try {
+      // Get API URL from environment or use default
+      const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5175";
+      
+      const response = await fetch(`${API_URL}/api/waitlist`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
       });
-      setMainEmail("");
-    }, 1500);
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setIsSuccess(true);
+        setSubmittedBrand(formData.brandName);
+        setSubmittedEmail(formData.email);
+
+        // Reset form fields
+        setFormData({
+          brandName: "",
+          yourName: "",
+          email: "",
+          mobile: "",
+          website: "",
+          category: "",
+          aboutBrand: "",
+        });
+        setMainEmail("");
+      } else {
+        // Handle validation errors from backend
+        if (data.errors && Array.isArray(data.errors)) {
+          const newErrors = {};
+          data.errors.forEach((error) => {
+            if (error.toLowerCase().includes("brand name")) {
+              newErrors.brandName = error;
+            } else if (error.toLowerCase().includes("your name")) {
+              newErrors.yourName = error;
+            } else if (error.toLowerCase().includes("email")) {
+              newErrors.email = error;
+            } else if (error.toLowerCase().includes("mobile")) {
+              newErrors.mobile = error;
+            } else if (error.toLowerCase().includes("category")) {
+              newErrors.category = error;
+            } else {
+              setApiError(error);
+            }
+          });
+          setErrors(newErrors);
+          
+          const modal = document.querySelector(".modal-content");
+          if (modal) {
+            modal.classList.add("shake");
+            setTimeout(() => modal.classList.remove("shake"), 500);
+          }
+        } else {
+          setApiError(data.message || "Submission failed. Please try again.");
+        }
+      }
+    } catch (error) {
+      console.error("Submission error:", error);
+      setApiError(
+        "Network error. Please check your connection and try again."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Helper for displaying double digits in countdown
@@ -275,8 +312,6 @@ const Home = () => {
             alt="Brandel Logo"
             className="brand-logo w-50"
           />
-          {/* <h1 className="brand-name">Brandel</h1> */}
-          {/* <span className="brand-tagline">WHERE BRANDS DWELL</span> */}
         </div>
       </header>
 
@@ -563,6 +598,14 @@ const Home = () => {
                     premium shopping experience.
                   </p>
                 </div>
+
+                {/* Display API Error */}
+                {apiError && (
+                  <div className="api-error-message">
+                    <span className="error-icon">⚠️</span>
+                    {apiError}
+                  </div>
+                )}
 
                 {/* Registration Form */}
                 <form
