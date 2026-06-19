@@ -29,29 +29,29 @@ const sendAdminNotification = async (formData) => {
                     </div>
                 </div>
 
-                <div style="background: #fff3cd; padding: 15px; border-radius: 8px; border-left: 4px solid #ffc107; margin: 20px 0;">
-                    <p style="margin: 0; color: #856404;">
-                        <strong>⏰ Submitted:</strong> ${new Date().toLocaleString()}
-                    </p>
-                </div>
 
-                <div style="text-align: center; margin-top: 25px; padding-top: 20px; border-top: 1px solid #eee;">
-                    <a href="${process.env.FRONTEND_URL}/admin" style="display: inline-block; background: #1a1a2e; color: #ffd700; padding: 12px 30px; text-decoration: none; border-radius: 25px; font-weight: bold;">
-                        📊 View All Applications
-                    </a>
-                </div>
+              
             </div>
         </div>
     `;
 
     const mailOptions = {
-        from: process.env.EMAIL_USER,
+        from: `"Brandel Admin" <${process.env.EMAIL_USER}>`,
         to: adminEmail,
         subject: `🆕 New Waitlist Application: ${formData.brandName}`,
-        html: adminHtml
+        html: adminHtml,
+        replyTo: formData.email // Allows admin to reply directly to applicant
     };
 
-    return transporter.sendMail(mailOptions);
+    try {
+        const info = await transporter.sendMail(mailOptions);
+        console.log(`✅ Admin notification sent to ${adminEmail}`);
+        console.log(`📨 Message ID: ${info.messageId}`);
+        return info;
+    } catch (error) {
+        console.error('❌ Failed to send admin notification:', error);
+        throw error;
+    }
 };
 
 // Send user confirmation email
@@ -111,13 +111,23 @@ const sendUserConfirmation = async (formData) => {
     `;
 
     const mailOptions = {
-        from: process.env.EMAIL_USER,
+        from: `"Brandel" <${process.env.EMAIL_USER}>`,
         to: formData.email,
         subject: `✅ Brandel Waitlist Application Received: ${formData.brandName}`,
-        html: userHtml
+        html: userHtml,
+        replyTo: process.env.EMAIL_USER // Allows user to reply to admin
     };
 
-    return transporter.sendMail(mailOptions);
+    try {
+        const info = await transporter.sendMail(mailOptions);
+        console.log(`✅ User confirmation sent to ${formData.email}`);
+        console.log(`📨 Message ID: ${info.messageId}`);
+        return info;
+    } catch (error) {
+        console.error(`❌ Failed to send user confirmation to ${formData.email}:`, error);
+        // Don't throw - user confirmation failure shouldn't break the whole flow
+        return null;
+    }
 };
 
 // Main controller function
@@ -125,25 +135,41 @@ const handleWaitlistSubmission = async (req, res) => {
     try {
         const formData = req.body;
 
+        console.log(`📝 Processing application for: ${formData.brandName}`);
+        console.log(`👤 Applicant: ${formData.yourName} (${formData.email})`);
+
         // Save to database/model
         const savedEntry = waitlistModel.addToWaitlist(formData);
+        console.log(`💾 Application saved with ID: ${savedEntry.id}`);
 
-        // Send admin notification
+        // Send admin notification (required)
         await sendAdminNotification(formData);
-        console.log('Admin notification sent');
 
-        // Send user confirmation
-        await sendUserConfirmation(formData);
-        console.log('User confirmation sent');
+        // Send user confirmation (try, but don't fail if it doesn't work)
+        let userEmailSent = false;
+        try {
+            const userResult = await sendUserConfirmation(formData);
+            if (userResult) {
+                userEmailSent = true;
+                console.log(`✅ User confirmation email sent successfully`);
+            }
+        } catch (userEmailError) {
+            console.warn('⚠️ User confirmation email failed, but application was saved:', userEmailError.message);
+            // Continue - don't fail the whole request
+        }
 
         res.status(200).json({
             success: true,
             message: 'Application submitted successfully',
-            data: savedEntry
+            data: savedEntry,
+            email_status: {
+                admin_sent: true,
+                user_sent: userEmailSent
+            }
         });
 
     } catch (error) {
-        console.error('Error in waitlist submission:', error);
+        console.error('❌ Error in waitlist submission:', error);
         res.status(500).json({
             success: false,
             message: 'Failed to submit application',
@@ -156,12 +182,14 @@ const handleWaitlistSubmission = async (req, res) => {
 const getAllWaitlistEntries = (req, res) => {
     try {
         const entries = waitlistModel.getAllEntries();
+        console.log(`📊 Retrieved ${entries.length} waitlist entries`);
         res.status(200).json({
             success: true,
             count: entries.length,
             data: entries
         });
     } catch (error) {
+        console.error('❌ Failed to retrieve entries:', error);
         res.status(500).json({
             success: false,
             message: 'Failed to retrieve entries',
@@ -170,7 +198,35 @@ const getAllWaitlistEntries = (req, res) => {
     }
 };
 
+// Get single entry by email (optional admin endpoint)
+const getEntryByEmail = (req, res) => {
+    try {
+        const { email } = req.params;
+        const entry = waitlistModel.getEntryByEmail(email);
+        
+        if (!entry) {
+            return res.status(404).json({
+                success: false,
+                message: 'Entry not found'
+            });
+        }
+        
+        res.status(200).json({
+            success: true,
+            data: entry
+        });
+    } catch (error) {
+        console.error('❌ Failed to retrieve entry:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to retrieve entry',
+            error: error.message
+        });
+    }
+};
+
 module.exports = {
     handleWaitlistSubmission,
-    getAllWaitlistEntries
+    getAllWaitlistEntries,
+    getEntryByEmail
 };

@@ -9,8 +9,11 @@ const PORT = process.env.PORT || 5175;
 
 // Middleware
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-    credentials: true
+  origin: [
+    "https://brandel.shop",
+    "https://www.brandel.shop"
+  ],
+  credentials: true
 }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -33,3 +36,9 @@ app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
     console.log(`Email configured for: ${process.env.EMAIL_USER}`);
 });
+
+
+
+// rm -rf /var/www/brandel/*
+// cp -r build/* /var/www/brandel/
+// systemctl restart nginx
