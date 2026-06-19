@@ -31,11 +31,11 @@ const sendAdminNotification = async (formData) => {
 
                 <div style="background: #fff3cd; padding: 15px; border-radius: 8px; border-left: 4px solid #ffc107; margin: 20px 0;">
                     <p style="margin: 0; color: #856404;">
-                        <strong>⏰ Submitted:</strong> 
+                        <strong>⏰ Submitted:</strong> ${new Date()}
                     </p>
                 </div>
 
-    
+                
             </div>
         </div>
     `;
