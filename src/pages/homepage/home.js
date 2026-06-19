@@ -207,7 +207,7 @@ const Home = () => {
 
     try {
       // Get API URL from environment or use default
-      const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5175";
+      const API_URL = "https://api.brandel.shop"; // Replace with your actual backend API URL
       
       const response = await fetch(`${API_URL}/api/waitlist`, {
         method: "POST",
@@ -424,7 +424,7 @@ const Home = () => {
             </button>
           </div> */}
           <a
-            href="https://wa.me/919999999999?text=Hello%20I%20would%20like%20to%20apply%20for%20an%20invitation."
+            href="https://wa.me/917016929807?text=Hello%20I%20would%20like%20to%20apply%20for%20an%20invitation."
             target="_blank"
             rel="noopener noreferrer"
             className="whatsapp-btn"
