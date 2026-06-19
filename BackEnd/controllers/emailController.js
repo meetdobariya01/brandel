@@ -29,11 +29,6 @@ const sendAdminNotification = async (formData) => {
                     </div>
                 </div>
 
-                <div style="background: #fff3cd; padding: 15px; border-radius: 8px; border-left: 4px solid #ffc107; margin: 20px 0;">
-                    <p style="margin: 0; color: #856404;">
-                        <strong>⏰ Submitted:</strong> ${new Date()}
-                    </p>
-                </div>
 
                 
             </div>
@@ -73,7 +68,7 @@ const sendUserConfirmation = async (formData) => {
                     <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
                         <p style="margin: 5px 0;"><strong>Brand:</strong> ${formData.brandName}</p>
                         <p style="margin: 5px 0;"><strong>Category:</strong> ${formData.category}</p>
-                        <p style="margin: 5px 0;"><strong>Submitted:</strong> ${new Date().toLocaleString()}</p>
+                       
                     </div>
                 </div>
 
