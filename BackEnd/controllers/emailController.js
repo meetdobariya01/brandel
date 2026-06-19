@@ -29,20 +29,8 @@ const sendAdminNotification = async (formData) => {
                     </div>
                 </div>
 
-                <div style="background: #fff3cd; padding: 15px; border-radius: 8px; border-left: 4px solid #ffc107; margin: 20px 0;">
-                    <p style="margin: 0; color: #856404;">
-                        <strong>⏰ Submitted:</strong> ${new Date().toLocaleString()}
-                    </p>
-                </div>
 
-                <div style="text-align: center; margin-top: 25px; padding-top: 20px; border-top: 1px solid #eee;">
-                    <p style="color: #666; font-size: 14px;">
-                        <strong>Total Applications:</strong> ${waitlistModel.getAllEntries().length}
-                    </p>
-                    <p style="color: #666; font-size: 12px; margin-top: 5px;">
-                        Reply directly to this email to contact the applicant.
-                    </p>
-                </div>
+              
             </div>
         </div>
     `;
