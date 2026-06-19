@@ -31,15 +31,11 @@ const sendAdminNotification = async (formData) => {
 
                 <div style="background: #fff3cd; padding: 15px; border-radius: 8px; border-left: 4px solid #ffc107; margin: 20px 0;">
                     <p style="margin: 0; color: #856404;">
-                        <strong>⏰ Submitted:</strong> ${new Date().toLocaleString()}
+                        <strong>⏰ Submitted:</strong> 
                     </p>
                 </div>
 
-                <div style="text-align: center; margin-top: 25px; padding-top: 20px; border-top: 1px solid #eee;">
-                    <a href="${process.env.FRONTEND_URL}/admin" style="display: inline-block; background: #1a1a2e; color: #ffd700; padding: 12px 30px; text-decoration: none; border-radius: 25px; font-weight: bold;">
-                        📊 View All Applications
-                    </a>
-                </div>
+    
             </div>
         </div>
     `;

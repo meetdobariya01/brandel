@@ -36,3 +36,9 @@ app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
     console.log(`Email configured for: ${process.env.EMAIL_USER}`);
 });
+
+
+
+// rm -rf /var/www/brandel/*
+// cp -r build/* /var/www/brandel/
+// systemctl restart nginx
