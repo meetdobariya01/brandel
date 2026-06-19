@@ -306,7 +306,7 @@ const Home = () => {
       <div className="glow-effect glow-bottom-right" aria-hidden="true" />
 
       {/* Header Area */}
-      {/* <header className="page-header animate-fade-in-down">
+      <header className="page-header animate-fade-in-down">
         <div className="logo-wrapper">
           <img
             src="./images/brandel.png"
@@ -314,7 +314,7 @@ const Home = () => {
             className="brand-logo w-50"
           />
         </div>
-      </header> */}
+      </header>
 
       {/* Main Hero Card Container */}
       <main className="main-content-area">
@@ -451,13 +451,13 @@ const Home = () => {
         </section>
         <section className="coming-soon-card animate-fade-in-up">
           <header className="page-header animate-fade-in-down">
-            <div className="logo-wrapper">
+            {/* <div className="logo-wrapper">
               <img
                 src="./images/brandel.png"
                 alt="Brandel Logo"
                 className="brand-logo w-50"
               />
-            </div>
+            </div> */}
           </header>
           {/* Badge */}
           <div className="badge-pill">
