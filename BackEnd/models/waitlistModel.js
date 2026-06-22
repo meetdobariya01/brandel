@@ -1,4 +1,4 @@
-// In-memory storage (for demo - use MongoDB/PostgreSQL in production)
+// models/waitlistModel.js
 let waitlistEntries = [];
 
 const addToWaitlist = (entry) => {
@@ -6,7 +6,11 @@ const addToWaitlist = (entry) => {
         id: Date.now(),
         ...entry,
         submittedAt: new Date().toISOString(),
-        status: 'pending'
+        status: 'pending',
+        adminNotes: '',
+        followupNotes: '',
+        lastFollowupDate: null,
+        assignee: ''
     };
     waitlistEntries.push(newEntry);
     return newEntry;
@@ -20,9 +24,78 @@ const getEntryByEmail = (email) => {
     return waitlistEntries.find(entry => entry.email === email);
 };
 
+const getEntryById = (id) => {
+    return waitlistEntries.find(entry => entry.id === parseInt(id));
+};
+
+const updateEntry = (id, updates) => {
+    const index = waitlistEntries.findIndex(entry => entry.id === parseInt(id));
+    if (index === -1) return null;
+    
+    waitlistEntries[index] = {
+        ...waitlistEntries[index],
+        ...updates,
+        updatedAt: new Date().toISOString()
+    };
+    return waitlistEntries[index];
+};
+
+const getEntriesWithFilters = (filters = {}) => {
+    let filtered = [...waitlistEntries];
+    
+    if (filters.startDate) {
+        const start = new Date(filters.startDate);
+        filtered = filtered.filter(entry => new Date(entry.submittedAt) >= start);
+    }
+    
+    if (filters.endDate) {
+        const end = new Date(filters.endDate);
+        end.setHours(23, 59, 59, 999);
+        filtered = filtered.filter(entry => new Date(entry.submittedAt) <= end);
+    }
+    
+    if (filters.status && filters.status !== 'all') {
+        filtered = filtered.filter(entry => entry.status === filters.status);
+    }
+    
+    if (filters.category && filters.category !== 'all') {
+        filtered = filtered.filter(entry => entry.category === filters.category);
+    }
+    
+    if (filters.search) {
+        const search = filters.search.toLowerCase();
+        filtered = filtered.filter(entry => 
+            entry.brandName.toLowerCase().includes(search) ||
+            entry.yourName.toLowerCase().includes(search) ||
+            entry.email.toLowerCase().includes(search) ||
+            entry.mobile.includes(search)
+        );
+    }
+    
+    // Sort by submittedAt descending
+    filtered.sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+    
+    return filtered;
+};
+
+const getStats = () => {
+    const total = waitlistEntries.length;
+    const pending = waitlistEntries.filter(e => e.status === 'pending').length;
+    const under_review = waitlistEntries.filter(e => e.status === 'under_review').length;
+    const shortlisted = waitlistEntries.filter(e => e.status === 'shortlisted').length;
+    const invited = waitlistEntries.filter(e => e.status === 'invited').length;
+    const rejected = waitlistEntries.filter(e => e.status === 'rejected').length;
+    
+    return { total, pending, under_review, shortlisted, invited, rejected };
+};
+
 module.exports = {
     addToWaitlist,
     getAllEntries,
     getEntryByEmail,
+    getEntryById,
+    updateEntry,
+    getEntriesWithFilters,
+    getStats,
     waitlistEntries
 };

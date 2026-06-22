@@ -207,8 +207,8 @@ const Home = () => {
 
     try {
       // Get API URL from environment or use default
-      const API_URL = "https://api.brandel.shop"; // Replace with your actual backend API URL
-      
+      // const API_URL = "https://api.brandel.shop"; // Replace with your actual backend API URL
+       const API_URL = "http://localhost:5000"; // For local development
       const response = await fetch(`${API_URL}/api/waitlist`, {
         method: "POST",
         headers: {

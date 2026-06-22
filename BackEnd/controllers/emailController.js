@@ -1,3 +1,4 @@
+// controllers/emailController.js
 const transporter = require('../config/emailConfig');
 const waitlistModel = require('../models/waitlistModel');
 
@@ -28,9 +29,6 @@ const sendAdminNotification = async (formData) => {
                         ${formData.aboutBrand ? `<p style="margin: 5px 0;"><strong>📝 About:</strong> ${formData.aboutBrand}</p>` : ''}
                     </div>
                 </div>
-
-
-              
             </div>
         </div>
     `;
@@ -40,7 +38,7 @@ const sendAdminNotification = async (formData) => {
         to: adminEmail,
         subject: `🆕 New Waitlist Application: ${formData.brandName}`,
         html: adminHtml,
-        replyTo: formData.email // Allows admin to reply directly to applicant
+        replyTo: formData.email
     };
 
     try {
@@ -115,7 +113,7 @@ const sendUserConfirmation = async (formData) => {
         to: formData.email,
         subject: `✅ Brandel Waitlist Application Received: ${formData.brandName}`,
         html: userHtml,
-        replyTo: process.env.EMAIL_USER // Allows user to reply to admin
+        replyTo: process.env.EMAIL_USER
     };
 
     try {
@@ -125,12 +123,11 @@ const sendUserConfirmation = async (formData) => {
         return info;
     } catch (error) {
         console.error(`❌ Failed to send user confirmation to ${formData.email}:`, error);
-        // Don't throw - user confirmation failure shouldn't break the whole flow
         return null;
     }
 };
 
-// Main controller function
+// Main controller function - Handle waitlist submission
 const handleWaitlistSubmission = async (req, res) => {
     try {
         const formData = req.body;
@@ -155,7 +152,6 @@ const handleWaitlistSubmission = async (req, res) => {
             }
         } catch (userEmailError) {
             console.warn('⚠️ User confirmation email failed, but application was saved:', userEmailError.message);
-            // Continue - don't fail the whole request
         }
 
         res.status(200).json({
@@ -178,15 +174,21 @@ const handleWaitlistSubmission = async (req, res) => {
     }
 };
 
-// Get all entries (admin endpoint)
+// Get all entries with filters
 const getAllWaitlistEntries = (req, res) => {
     try {
-        const entries = waitlistModel.getAllEntries();
+        const { startDate, endDate, status, category, search } = req.query;
+        
+        const filters = { startDate, endDate, status, category, search };
+        const entries = waitlistModel.getEntriesWithFilters(filters);
+        const stats = waitlistModel.getStats();
+        
         console.log(`📊 Retrieved ${entries.length} waitlist entries`);
         res.status(200).json({
             success: true,
             count: entries.length,
-            data: entries
+            data: entries,
+            stats: stats
         });
     } catch (error) {
         console.error('❌ Failed to retrieve entries:', error);
@@ -198,11 +200,11 @@ const getAllWaitlistEntries = (req, res) => {
     }
 };
 
-// Get single entry by email (optional admin endpoint)
-const getEntryByEmail = (req, res) => {
+// Get single entry by ID
+const getEntryById = (req, res) => {
     try {
-        const { email } = req.params;
-        const entry = waitlistModel.getEntryByEmail(email);
+        const { id } = req.params;
+        const entry = waitlistModel.getEntryById(id);
         
         if (!entry) {
             return res.status(404).json({
@@ -225,8 +227,206 @@ const getEntryByEmail = (req, res) => {
     }
 };
 
+// Update entry status
+const updateEntryStatus = (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status, adminNotes, assignee, followupNotes } = req.body;
+        
+        const updated = waitlistModel.updateEntry(id, {
+            status,
+            adminNotes,
+            assignee,
+            followupNotes,
+            lastFollowupDate: followupNotes ? new Date().toISOString() : undefined
+        });
+        
+        if (!updated) {
+            return res.status(404).json({
+                success: false,
+                message: 'Entry not found'
+            });
+        }
+        
+        res.status(200).json({
+            success: true,
+            data: updated,
+            message: 'Entry updated successfully'
+        });
+    } catch (error) {
+        console.error('❌ Failed to update entry:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to update entry',
+            error: error.message
+        });
+    }
+};
+
+// 📥 DOWNLOAD INQUIRY REPORT - CSV/JSON
+const downloadInquiryReport = (req, res) => {
+    try {
+        const { 
+            startDate, 
+            endDate, 
+            status, 
+            category, 
+            search,
+            format = 'csv',
+            fields = []
+        } = req.query;
+
+        // Get filtered entries
+        const filters = { startDate, endDate, status, category, search };
+        const entries = waitlistModel.getEntriesWithFilters(filters);
+
+        if (entries.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'No data found for the selected filters'
+            });
+        }
+
+        // Prepare data for export
+        const exportData = entries.map(entry => ({
+            'Inquiry ID': entry.id,
+            'Brand Name': entry.brandName || '',
+            'Your Name': entry.yourName || '',
+            'Email': entry.email || '',
+            'Mobile': entry.mobile || '',
+            'Website/Instagram': entry.website || 'N/A',
+            'Category': entry.category || '',
+            'About Brand': entry.aboutBrand || 'N/A',
+            'Status': entry.status ? entry.status.charAt(0).toUpperCase() + entry.status.slice(1).replace('_', ' ') : 'Pending',
+            'Date Submitted': new Date(entry.submittedAt).toLocaleString('en-US', {
+                month: '2-digit',
+                day: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            }),
+            'Admin Notes': entry.adminNotes || 'N/A',
+            'Follow-up Notes': entry.followupNotes || 'N/A',
+            'Last Follow-up': entry.lastFollowupDate ? 
+                new Date(entry.lastFollowupDate).toLocaleDateString('en-US') : 
+                'N/A',
+            'Assignee': entry.assignee || 'Unassigned'
+        }));
+
+        // Filter fields if specified
+        let finalData = exportData;
+        if (fields && fields.length > 0) {
+            const fieldSet = new Set(fields);
+            finalData = exportData.map(row => {
+                const filteredRow = {};
+                fieldSet.forEach(field => {
+                    if (row[field] !== undefined) {
+                        filteredRow[field] = row[field];
+                    }
+                });
+                return filteredRow;
+            });
+        }
+
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+        const filename = `brandel-inquiries-${timestamp}`;
+
+        // JSON export
+        if (format === 'json') {
+            return res.status(200).json({
+                success: true,
+                data: finalData,
+                metadata: {
+                    total: finalData.length,
+                    generatedAt: new Date().toISOString(),
+                    filters: { startDate, endDate, status, category, search }
+                }
+            });
+        }
+
+        // CSV export (default)
+        if (finalData.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'No data to export'
+            });
+        }
+
+        // Generate CSV manually
+        const headers = Object.keys(finalData[0]);
+        let csvRows = [];
+        
+        // Add headers
+        csvRows.push(headers.join(','));
+        
+        // Add rows
+        for (const row of finalData) {
+            const values = headers.map(header => {
+                const value = row[header] || '';
+                const escaped = String(value).replace(/"/g, '""');
+                return `"${escaped}"`;
+            });
+            csvRows.push(values.join(','));
+        }
+
+        const csv = csvRows.join('\n');
+
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', `attachment; filename=${filename}.csv`);
+        res.setHeader('Cache-Control', 'no-cache');
+        res.status(200).send(csv);
+
+    } catch (error) {
+        console.error('❌ Error generating report:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to generate report',
+            error: error.message
+        });
+    }
+};
+
+// Bulk update status
+const bulkUpdateStatus = (req, res) => {
+    try {
+        const { ids, status } = req.body;
+        
+        if (!ids || !Array.isArray(ids) || ids.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'No IDs provided for bulk update'
+            });
+        }
+
+        let updatedCount = 0;
+        ids.forEach(id => {
+            const updated = waitlistModel.updateEntry(id, { 
+                status,
+                updatedAt: new Date().toISOString()
+            });
+            if (updated) updatedCount++;
+        });
+
+        res.status(200).json({
+            success: true,
+            message: `${updatedCount} entries updated successfully`,
+            updatedCount
+        });
+    } catch (error) {
+        console.error('❌ Failed bulk update:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to update entries',
+            error: error.message
+        });
+    }
+};
+
 module.exports = {
     handleWaitlistSubmission,
     getAllWaitlistEntries,
-    getEntryByEmail
+    getEntryById,
+    updateEntryStatus,
+    downloadInquiryReport,
+    bulkUpdateStatus
 };
