@@ -304,7 +304,7 @@ const Home = () => {
       <div className="glow-effect glow-bottom-right" aria-hidden="true" />
 
       {/* Header Area */}
-      {/* <header className="page-header animate-fade-in-down">
+      <header className="page-header animate-fade-in-down">
         <div className="logo-wrapper">
           <img
             src="./images/brandel.png"
@@ -312,19 +312,21 @@ const Home = () => {
             className="brand-logo w-50"
           />
         </div>
-      </header> */}
+      </header>
 
       {/* Main Hero Card Container */}
       <main className="main-content-area">
+        {/* Why Join Brandel Highlight Section (Bottom of Page) */}
+
         <section className="coming-soon-card animate-fade-in-up">
           <header className="page-header animate-fade-in-down">
-            <div className="logo-wrapper">
+            {/* <div className="logo-wrapper">
               <img
                 src="./images/brandel.png"
                 alt="Brandel Logo"
                 className="brand-logo w-50"
               />
-            </div>
+            </div> */}
           </header>
           {/* Badge */}
           <div className="badge-pill">
@@ -423,18 +425,41 @@ const Home = () => {
               </span>
             </button>
           </div> */}
-          <a
-            href="https://wa.me/917016929807?text=Hello%20I%20would%20like%20to%20apply%20for%20an%20invitation."
-            target="_blank"
-            rel="noopener noreferrer"
-            className="whatsapp-btn"
-          >
-            <FaWhatsapp />
-            Connect in WhatsApp
-          </a>
+
+          <div className="invitation-footer-card">
+            <h4 className="invitation-title">Apply for Invitation</h4>
+            <p className="invitation-description">
+              Applications are reviewed manually. Selected brands will receive
+              an invitation link to complete onboarding before August 2026.
+            </p>
+            <button
+              type="button"
+              className="apply-invitation-btn"
+              onClick={() => handleOpenModal()}
+            >
+              <span>Apply for Invitation</span>
+              <svg
+                className="btn-sparkle"
+                viewBox="0 0 24 24"
+                width="18"
+                height="18"
+                fill="currentColor"
+              >
+                <path d="M12 2l2.4 5.2 5.6 1.8-4.2 4 1.2 5.7-5-3.2-5 3.2 1.2-5.7-4.2-4 5.6-1.8z" />
+              </svg>
+            </button>
+            {/* <a
+              href="https://wa.me/919999999999?text=Hello%20I%20would%20like%20to%20apply%20for%20an%20invitation."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="whatsapp-btn"
+            >
+              <FaWhatsapp />
+              
+            </a> */}
+          </div>
         </section>
 
-        {/* Why Join Brandel Highlight Section (Bottom of Page) */}
         <section className="why-join-section animate-fade-in-up-delay">
           <div className="why-join-header">
             <h3 className="section-title">Why Join Brandel?</h3>
@@ -532,39 +557,18 @@ const Home = () => {
             </div>
           </div>
 
-          <div className="invitation-footer-card">
-            <h4 className="invitation-title">Apply for Invitation</h4>
-            <p className="invitation-description">
-              Applications are reviewed manually. Selected brands will receive
-              an invitation link to complete onboarding before August 2026.
-            </p>
-            <button
-              type="button"
-              className="apply-invitation-btn"
-              onClick={() => handleOpenModal()}
-            >
-              <span>Apply for Invitation</span>
-              <svg
-                className="btn-sparkle"
-                viewBox="0 0 24 24"
-                width="18"
-                height="18"
-                fill="currentColor"
-              >
-                <path d="M12 2l2.4 5.2 5.6 1.8-4.2 4 1.2 5.7-5-3.2-5 3.2 1.2-5.7-4.2-4 5.6-1.8z" />
-              </svg>
-            </button>
-            {/* <a
-              href="https://wa.me/919999999999?text=Hello%20I%20would%20like%20to%20apply%20for%20an%20invitation."
-              target="_blank"
-              rel="noopener noreferrer"
-              className="whatsapp-btn"
-            >
-              <FaWhatsapp />
-              
-            </a> */}
-          </div>
+          <a
+            href="https://wa.me/919999999999?text=Hello%20I%20would%20like%20to%20apply%20for%20an%20invitation."
+            target="_blank"
+            rel="noopener noreferrer"
+            className="whatsapp-btn"
+          >
+            <FaWhatsapp />
+            Connect in WhatsApp
+          </a>
         </section>
+
+        {/* Why Join Brandel Highlight Section (Bottom of Page) */}
       </main>
 
       {/* Footer Area */}
