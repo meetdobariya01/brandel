@@ -29,6 +29,12 @@ const sendAdminNotification = async (formData) => {
                         ${formData.aboutBrand ? `<p style="margin: 5px 0;"><strong>📝 About:</strong> ${formData.aboutBrand}</p>` : ''}
                     </div>
                 </div>
+
+                <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #ffd700;">
+                    <p style="color: #666; font-size: 14px;">
+                        <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/admin" style="color: #1a1a2e; font-weight: bold;">📊 View in Admin Dashboard</a>
+                    </p>
+                </div>
             </div>
         </div>
     `;
@@ -44,11 +50,10 @@ const sendAdminNotification = async (formData) => {
     try {
         const info = await transporter.sendMail(mailOptions);
         console.log(`✅ Admin notification sent to ${adminEmail}`);
-        console.log(`📨 Message ID: ${info.messageId}`);
         return info;
     } catch (error) {
         console.error('❌ Failed to send admin notification:', error);
-        throw error;
+        return null;
     }
 };
 
@@ -98,11 +103,6 @@ const sendUserConfirmation = async (formData) => {
                     <p style="color: #666; font-size: 14px;">
                         Questions? Contact us at <a href="mailto:care@brandel.shop" style="color: #1a1a2e; font-weight: bold;">care@brandel.shop</a>
                     </p>
-                    <div style="margin-top: 15px;">
-                        <span style="display: inline-block; background: #ffd700; color: #1a1a2e; padding: 5px 15px; border-radius: 15px; font-size: 12px; font-weight: bold;">
-                            🏆 Founding Member Benefits
-                        </span>
-                    </div>
                 </div>
             </div>
         </div>
@@ -119,7 +119,6 @@ const sendUserConfirmation = async (formData) => {
     try {
         const info = await transporter.sendMail(mailOptions);
         console.log(`✅ User confirmation sent to ${formData.email}`);
-        console.log(`📨 Message ID: ${info.messageId}`);
         return info;
     } catch (error) {
         console.error(`❌ Failed to send user confirmation to ${formData.email}:`, error);
@@ -135,12 +134,25 @@ const handleWaitlistSubmission = async (req, res) => {
         console.log(`📝 Processing application for: ${formData.brandName}`);
         console.log(`👤 Applicant: ${formData.yourName} (${formData.email})`);
 
-        // Save to database/model
+        // Check if email already exists in in-memory storage
+        const existingEntry = waitlistModel.getEntryByEmail(formData.email);
+        if (existingEntry) {
+            return res.status(400).json({
+                success: false,
+                message: 'This email is already registered in our waitlist.'
+            });
+        }
+
+        // Save to in-memory storage
         const savedEntry = waitlistModel.addToWaitlist(formData);
         console.log(`💾 Application saved with ID: ${savedEntry.id}`);
 
-        // Send admin notification (required)
-        await sendAdminNotification(formData);
+        // Send admin notification (try, but don't fail if it doesn't work)
+        try {
+            await sendAdminNotification(formData);
+        } catch (adminEmailError) {
+            console.warn('⚠️ Admin email notification failed:', adminEmailError.message);
+        }
 
         // Send user confirmation (try, but don't fail if it doesn't work)
         let userEmailSent = false;
@@ -151,7 +163,7 @@ const handleWaitlistSubmission = async (req, res) => {
                 console.log(`✅ User confirmation email sent successfully`);
             }
         } catch (userEmailError) {
-            console.warn('⚠️ User confirmation email failed, but application was saved:', userEmailError.message);
+            console.warn('⚠️ User confirmation email failed:', userEmailError.message);
         }
 
         res.status(200).json({
@@ -422,6 +434,7 @@ const bulkUpdateStatus = (req, res) => {
     }
 };
 
+// Export all functions
 module.exports = {
     handleWaitlistSubmission,
     getAllWaitlistEntries,

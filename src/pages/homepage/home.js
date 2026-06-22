@@ -39,6 +39,9 @@ const Home = () => {
   // Floating particles array
   const [particles, setParticles] = useState([]);
 
+  // API URL from environment or default
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5175";
+
   // Generate background particles on mount
   useEffect(() => {
     const generated = Array.from({ length: 25 }).map((_, i) => ({
@@ -206,9 +209,6 @@ const Home = () => {
     setApiError("");
 
     try {
-      // Get API URL from environment or use default
-      // const API_URL = "https://api.brandel.shop"; // Replace with your actual backend API URL
-       const API_URL = "http://localhost:5000"; // For local development
       const response = await fetch(`${API_URL}/api/waitlist`, {
         method: "POST",
         headers: {
@@ -316,8 +316,6 @@ const Home = () => {
 
       {/* Main Hero Card Container */}
       <main className="main-content-area">
-        {/* Why Join Brandel Highlight Section (Bottom of Page) */}
-
         <section className="coming-soon-card animate-fade-in-up">
           <header className="page-header animate-fade-in-down">
             {/* <div className="logo-wrapper">
@@ -384,48 +382,6 @@ const Home = () => {
             </div>
           </div>
 
-          {/* Email notify form */}
-          {/* <form className="email-notify-row" onSubmit={handleMainSubmit}>
-            <input
-              type="email"
-              placeholder="Enter your email address"
-              className="main-email-input"
-              value={mainEmail}
-              onChange={(e) => setMainEmail(e.target.value)}
-              aria-label="Email address for waiting list"
-            />
-            <button type="submit" className="main-notify-button">
-              <span>Notify Me</span>
-              <svg
-                className="arrow-icon"
-                viewBox="0 0 24 24"
-                width="16"
-                height="16"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <line x1="5" y1="12" x2="19" y2="12" />
-                <polyline points="12 5 19 12 12 19" />
-              </svg>
-            </button>
-          </form> */}
-
-          {/* <div className="direct-cta-wrapper">
-            <button
-              type="button"
-              className="text-cta-button"
-              onClick={() => handleOpenModal()}
-            >
-              Or apply directly:{" "}
-              <span className="cta-highlight">
-                Join the Brandel Waiting List
-              </span>
-            </button>
-          </div> */}
-
           <div className="invitation-footer-card">
             <h4 className="invitation-title">Apply for Invitation</h4>
             <p className="invitation-description">
@@ -448,15 +404,6 @@ const Home = () => {
                 <path d="M12 2l2.4 5.2 5.6 1.8-4.2 4 1.2 5.7-5-3.2-5 3.2 1.2-5.7-4.2-4 5.6-1.8z" />
               </svg>
             </button>
-            {/* <a
-              href="https://wa.me/919999999999?text=Hello%20I%20would%20like%20to%20apply%20for%20an%20invitation."
-              target="_blank"
-              rel="noopener noreferrer"
-              className="whatsapp-btn"
-            >
-              <FaWhatsapp />
-              
-            </a> */}
           </div>
         </section>
 
@@ -567,8 +514,6 @@ const Home = () => {
             Connect in WhatsApp
           </a>
         </section>
-
-        {/* Why Join Brandel Highlight Section (Bottom of Page) */}
       </main>
 
       {/* Footer Area */}

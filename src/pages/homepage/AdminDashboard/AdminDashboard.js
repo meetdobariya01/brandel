@@ -23,6 +23,9 @@ const AdminDashboard = () => {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedInquiry, setSelectedInquiry] = useState(null);
 
+  // API URL from environment or default
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5175";
+
   const availableFields = [
     'Inquiry ID',
     'Brand Name',
@@ -53,7 +56,7 @@ const AdminDashboard = () => {
       if (filters.category && filters.category !== 'all') params.append('category', filters.category);
       if (filters.search) params.append('search', filters.search);
 
-      const response = await fetch(`/api/waitlist/all?${params}`);
+      const response = await fetch(`${API_URL}/api/waitlist/all?${params}`);
       
       if (!response.ok) {
         throw new Error('Failed to fetch inquiries');
@@ -67,7 +70,7 @@ const AdminDashboard = () => {
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, [filters, API_URL]);
 
   useEffect(() => {
     fetchInquiries();
@@ -81,7 +84,7 @@ const AdminDashboard = () => {
   // Handle status update
   const handleStatusUpdate = async (inquiryId, newStatus) => {
     try {
-      const response = await fetch(`/api/waitlist/${inquiryId}`, {
+      const response = await fetch(`${API_URL}/api/waitlist/${inquiryId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -100,7 +103,7 @@ const AdminDashboard = () => {
         )
       );
       // Refresh stats
-      const statsResponse = await fetch('/api/waitlist/all');
+      const statsResponse = await fetch(`${API_URL}/api/waitlist/all`);
       const statsData = await statsResponse.json();
       setStats(statsData.stats || {});
     } catch (err) {
@@ -130,7 +133,7 @@ const AdminDashboard = () => {
         });
       }
 
-      const response = await fetch(`/api/waitlist/download/report?${params}`);
+      const response = await fetch(`${API_URL}/api/waitlist/download/report?${params}`);
       
       if (!response.ok) {
         const errorData = await response.json();
@@ -183,7 +186,7 @@ const AdminDashboard = () => {
     }
 
     try {
-      const response = await fetch('/api/waitlist/bulk-update', {
+      const response = await fetch(`${API_URL}/api/waitlist/bulk-update`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -216,6 +219,15 @@ const AdminDashboard = () => {
     const statusInfo = statusMap[status] || statusMap.pending;
     return <span className={`status-badge ${statusInfo.class}`}>{statusInfo.label}</span>;
   };
+
+  if (loading) {
+    return (
+      <div className="admin-loading">
+        <div className="loader"></div>
+        <p>Loading inquiries...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="admin-dashboard">
@@ -400,67 +412,75 @@ const AdminDashboard = () => {
             </tr>
           </thead>
           <tbody>
-            {inquiries.map((inquiry) => (
-              <tr key={inquiry.id}>
-                <td>
-                  <input
-                    type="checkbox"
-                    checked={selectedIds.includes(inquiry.id)}
-                    onChange={() => {
-                      setSelectedIds(prev => 
-                        prev.includes(inquiry.id) 
-                          ? prev.filter(id => id !== inquiry.id)
-                          : [...prev, inquiry.id]
-                      );
-                    }}
-                  />
-                </td>
-                <td>
-                  <div className="brand-cell">
-                    <strong>{inquiry.brandName}</strong>
-                    <small>{inquiry.yourName}</small>
-                  </div>
-                </td>
-                <td>
-                  <div className="contact-cell">
-                    <div>{inquiry.email}</div>
-                    <small>{inquiry.mobile}</small>
-                  </div>
-                </td>
-                <td>{inquiry.category}</td>
-                <td>
-                  <StatusBadge status={inquiry.status} />
-                  <select
-                    className="status-select"
-                    value={inquiry.status}
-                    onChange={(e) => handleStatusUpdate(inquiry.id, e.target.value)}
-                  >
-                    <option value="pending">Pending</option>
-                    <option value="under_review">Under Review</option>
-                    <option value="shortlisted">Shortlisted</option>
-                    <option value="invited">Invited</option>
-                    <option value="rejected">Rejected</option>
-                  </select>
-                </td>
-                <td>
-                  <div className="date-cell">
-                    {new Date(inquiry.submittedAt).toLocaleDateString()}
-                    <small>{new Date(inquiry.submittedAt).toLocaleTimeString()}</small>
-                  </div>
-                </td>
-                <td>
-                  <button 
-                    className="btn-view"
-                    onClick={() => {
-                      setSelectedInquiry(inquiry);
-                      setShowDetailModal(true);
-                    }}
-                  >
-                    View
-                  </button>
+            {inquiries.length === 0 ? (
+              <tr>
+                <td colSpan="7" style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
+                  No inquiries found
                 </td>
               </tr>
-            ))}
+            ) : (
+              inquiries.map((inquiry) => (
+                <tr key={inquiry.id}>
+                  <td>
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.includes(inquiry.id)}
+                      onChange={() => {
+                        setSelectedIds(prev => 
+                          prev.includes(inquiry.id) 
+                            ? prev.filter(id => id !== inquiry.id)
+                            : [...prev, inquiry.id]
+                        );
+                      }}
+                    />
+                  </td>
+                  <td>
+                    <div className="brand-cell">
+                      <strong>{inquiry.brandName}</strong>
+                      <small>{inquiry.yourName}</small>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="contact-cell">
+                      <div>{inquiry.email}</div>
+                      <small>{inquiry.mobile}</small>
+                    </div>
+                  </td>
+                  <td>{inquiry.category}</td>
+                  <td>
+                    <StatusBadge status={inquiry.status} />
+                    <select
+                      className="status-select"
+                      value={inquiry.status}
+                      onChange={(e) => handleStatusUpdate(inquiry.id, e.target.value)}
+                    >
+                      <option value="pending">Pending</option>
+                      <option value="under_review">Under Review</option>
+                      <option value="shortlisted">Shortlisted</option>
+                      <option value="invited">Invited</option>
+                      <option value="rejected">Rejected</option>
+                    </select>
+                  </td>
+                  <td>
+                    <div className="date-cell">
+                      <div>{new Date(inquiry.submittedAt).toLocaleDateString()}</div>
+                      <small>{new Date(inquiry.submittedAt).toLocaleTimeString()}</small>
+                    </div>
+                  </td>
+                  <td>
+                    <button 
+                      className="btn-view"
+                      onClick={() => {
+                        setSelectedInquiry(inquiry);
+                        setShowDetailModal(true);
+                      }}
+                    >
+                      View
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

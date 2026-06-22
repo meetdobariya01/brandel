@@ -1,9 +1,11 @@
-// models/waitlistModel.js
+// models/waitlistModel.js - In-memory storage version
 let waitlistEntries = [];
+let idCounter = 1;
 
+// In-memory CRUD operations
 const addToWaitlist = (entry) => {
     const newEntry = {
-        id: Date.now(),
+        id: idCounter++,
         ...entry,
         submittedAt: new Date().toISOString(),
         status: 'pending',
@@ -13,6 +15,7 @@ const addToWaitlist = (entry) => {
         assignee: ''
     };
     waitlistEntries.push(newEntry);
+    console.log(`📝 Added entry: ${newEntry.brandName} (ID: ${newEntry.id})`);
     return newEntry;
 };
 
@@ -43,6 +46,7 @@ const updateEntry = (id, updates) => {
 const getEntriesWithFilters = (filters = {}) => {
     let filtered = [...waitlistEntries];
     
+    // Apply date filters
     if (filters.startDate) {
         const start = new Date(filters.startDate);
         filtered = filtered.filter(entry => new Date(entry.submittedAt) >= start);
@@ -54,25 +58,28 @@ const getEntriesWithFilters = (filters = {}) => {
         filtered = filtered.filter(entry => new Date(entry.submittedAt) <= end);
     }
     
+    // Apply status filter
     if (filters.status && filters.status !== 'all') {
         filtered = filtered.filter(entry => entry.status === filters.status);
     }
     
+    // Apply category filter
     if (filters.category && filters.category !== 'all') {
         filtered = filtered.filter(entry => entry.category === filters.category);
     }
     
+    // Apply search filter
     if (filters.search) {
         const search = filters.search.toLowerCase();
         filtered = filtered.filter(entry => 
-            entry.brandName.toLowerCase().includes(search) ||
-            entry.yourName.toLowerCase().includes(search) ||
-            entry.email.toLowerCase().includes(search) ||
-            entry.mobile.includes(search)
+            entry.brandName?.toLowerCase().includes(search) ||
+            entry.yourName?.toLowerCase().includes(search) ||
+            entry.email?.toLowerCase().includes(search) ||
+            entry.mobile?.includes(search)
         );
     }
     
-    // Sort by submittedAt descending
+    // Sort by submittedAt descending (newest first)
     filtered.sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
     
     return filtered;
@@ -89,6 +96,13 @@ const getStats = () => {
     return { total, pending, under_review, shortlisted, invited, rejected };
 };
 
+// Clear all entries (for testing)
+const clearEntries = () => {
+    waitlistEntries = [];
+    idCounter = 1;
+    console.log('🗑️ All entries cleared');
+};
+
 module.exports = {
     addToWaitlist,
     getAllEntries,
@@ -97,5 +111,6 @@ module.exports = {
     updateEntry,
     getEntriesWithFilters,
     getStats,
-    waitlistEntries
+    clearEntries,
+    waitlistEntries // Export for debugging
 };

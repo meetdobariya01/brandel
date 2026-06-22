@@ -1,10 +1,10 @@
+// routes/emailRoutes.js
 const express = require('express');
 const router = express.Router();
 const emailController = require('../controllers/emailController');
-const { validateWaitlistForm } = require('../middleware/validation');
 
-// Route for waitlist submission
-router.post('/waitlist', validateWaitlistForm, emailController.handleWaitlistSubmission);
+// Route for waitlist submission (without validation middleware)
+router.post('/waitlist', emailController.handleWaitlistSubmission);
 
 // Route to get all entries with filters
 router.get('/waitlist/all', emailController.getAllWaitlistEntries);
