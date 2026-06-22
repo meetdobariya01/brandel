@@ -873,3 +873,143 @@
     font-size: 12px;
   }
 }
+/* Delete Button Styles */
+.btn-delete {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 5px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.btn-delete:hover {
+  background: #c82333;
+  transform: scale(1.05);
+}
+
+.btn-delete:active {
+  transform: scale(0.95);
+}
+
+.btn-bulk.btn-delete {
+  background: #dc3545;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.btn-bulk.btn-delete:hover {
+  background: #c82333;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+}
+
+/* Delete Confirmation Modal */
+.delete-confirm {
+  max-width: 450px !important;
+  text-align: center;
+  padding: 40px 30px !important;
+}
+
+.delete-icon {
+  font-size: 60px;
+  margin-bottom: 20px;
+  display: block;
+}
+
+.delete-confirm h2 {
+  color: #dc3545;
+  margin-bottom: 15px;
+}
+
+.delete-confirm p {
+  color: #666;
+  margin-bottom: 25px;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.delete-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.btn-confirm-delete {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 10px 30px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-confirm-delete:hover {
+  background: #c82333;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+}
+
+.btn-cancel {
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 10px 30px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-cancel:hover {
+  background: #5a6268;
+  transform: translateY(-2px);
+}
+
+/* Actions column */
+.inquiries-table td:last-child {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  justify-content: center;
+  min-width: 100px;
+}
+
+/* Bulk actions spacing */
+.bulk-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin: 15px 0;
+  flex-wrap: wrap;
+}
+
+.bulk-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.selected-count {
+  font-weight: 600;
+  color: #333;
+  background: white;
+  padding: 5px 15px;
+  border-radius: 20px;
+  border: 1px solid #dee2e6;
+}

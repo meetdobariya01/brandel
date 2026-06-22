@@ -22,9 +22,12 @@ const AdminDashboard = () => {
   });
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedInquiry, setSelectedInquiry] = useState(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleteMode, setDeleteMode] = useState('single'); // 'single' or 'bulk'
 
   // API URL from environment or default
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5175";
+  const API_URL = "https://api.brandel.shop";
 
   const availableFields = [
     'Inquiry ID',
@@ -111,22 +114,91 @@ const AdminDashboard = () => {
     }
   };
 
+  // 🗑️ DELETE - Single inquiry
+  const handleDeleteSingle = (inquiryId) => {
+    setDeleteTarget(inquiryId);
+    setDeleteMode('single');
+    setShowDeleteConfirm(true);
+  };
+
+  // 🗑️ DELETE - Confirm deletion
+  const confirmDelete = async () => {
+    try {
+      let response;
+      
+      if (deleteMode === 'single') {
+        // Delete single entry
+        response = await fetch(`${API_URL}/api/waitlist/${deleteTarget}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+      } else {
+        // Bulk delete
+        response = await fetch(`${API_URL}/api/waitlist/bulk-delete`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ ids: selectedIds })
+        });
+      }
+
+      if (!response.ok) {
+        throw new Error('Failed to delete');
+      }
+
+      const data = await response.json();
+      
+      // Update local state
+      if (deleteMode === 'single') {
+        setInquiries(prev => prev.filter(item => item.id !== deleteTarget));
+        setSelectedIds(prev => prev.filter(id => id !== deleteTarget));
+      } else {
+        setInquiries(prev => prev.filter(item => !selectedIds.includes(item.id)));
+        setSelectedIds([]);
+        setSelectAll(false);
+      }
+      
+      // Refresh stats
+      const statsResponse = await fetch(`${API_URL}/api/waitlist/all`);
+      const statsData = await statsResponse.json();
+      setStats(statsData.stats || {});
+      
+      setShowDeleteConfirm(false);
+      setDeleteTarget(null);
+      
+      alert(data.message || 'Deleted successfully');
+    } catch (err) {
+      alert('Failed to delete: ' + err.message);
+      setShowDeleteConfirm(false);
+    }
+  };
+
+  // 🗑️ DELETE - Bulk delete
+  const handleBulkDelete = () => {
+    if (selectedIds.length === 0) {
+      alert('Please select at least one inquiry to delete');
+      return;
+    }
+    setDeleteMode('bulk');
+    setShowDeleteConfirm(true);
+  };
+
   // 📥 Handle download report
   const handleDownloadReport = async () => {
     try {
       const params = new URLSearchParams();
       
-      // Add filters
       if (filters.startDate) params.append('startDate', filters.startDate);
       if (filters.endDate) params.append('endDate', filters.endDate);
       if (filters.status && filters.status !== 'all') params.append('status', filters.status);
       if (filters.category && filters.category !== 'all') params.append('category', filters.category);
       if (filters.search) params.append('search', filters.search);
       
-      // Add format
       params.append('format', exportOptions.format);
       
-      // Add selected fields
       if (exportOptions.fields.length > 0) {
         exportOptions.fields.forEach(field => {
           params.append('fields', field);
@@ -140,7 +212,6 @@ const AdminDashboard = () => {
         throw new Error(errorData.message || 'Failed to download report');
       }
 
-      // Handle CSV download
       if (exportOptions.format === 'csv') {
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
@@ -153,7 +224,6 @@ const AdminDashboard = () => {
         a.remove();
         window.URL.revokeObjectURL(url);
       } else {
-        // JSON download
         const data = await response.json();
         const jsonString = JSON.stringify(data, null, 2);
         const blob = new Blob([jsonString], { type: 'application/json' });
@@ -384,6 +454,12 @@ const AdminDashboard = () => {
             >
               Reject
             </button>
+            <button 
+              className="btn-bulk btn-delete"
+              onClick={handleBulkDelete}
+            >
+              🗑️ Delete Selected
+            </button>
           </div>
         )}
       </div>
@@ -477,6 +553,13 @@ const AdminDashboard = () => {
                     >
                       View
                     </button>
+                    <button 
+                      className="btn-delete"
+                      onClick={() => handleDeleteSingle(inquiry.id)}
+                      title="Delete inquiry"
+                    >
+                      🗑️
+                    </button>
                   </td>
                 </tr>
               ))
@@ -484,6 +567,37 @@ const AdminDashboard = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="modal-overlay" onClick={() => setShowDeleteConfirm(false)}>
+          <div className="modal-content delete-confirm" onClick={e => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => setShowDeleteConfirm(false)}>×</button>
+            <div className="delete-icon">🗑️</div>
+            <h2>Confirm Delete</h2>
+            <p>
+              {deleteMode === 'single' 
+                ? 'Are you sure you want to delete this inquiry? This action cannot be undone.'
+                : `Are you sure you want to delete ${selectedIds.length} inquiries? This action cannot be undone.`
+              }
+            </p>
+            <div className="delete-actions">
+              <button 
+                className="btn-cancel"
+                onClick={() => setShowDeleteConfirm(false)}
+              >
+                Cancel
+              </button>
+              <button 
+                className="btn-confirm-delete"
+                onClick={confirmDelete}
+              >
+                Yes, Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Export Modal */}
       {showExportModal && (

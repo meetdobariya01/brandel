@@ -1,81 +1,73 @@
-// models/waitlistModel.js - In-memory storage version
-let waitlistEntries = [];
-let idCounter = 1;
+// models/waitlistModel.js
+const { v4: uuidv4 } = require('uuid');
 
-// In-memory CRUD operations
-const addToWaitlist = (entry) => {
+// In-memory storage
+let waitlistData = [];
+
+// Add entry to waitlist
+const addToWaitlist = (formData) => {
     const newEntry = {
-        id: idCounter++,
-        ...entry,
-        submittedAt: new Date().toISOString(),
+        id: uuidv4(),
+        brandName: formData.brandName,
+        yourName: formData.yourName,
+        email: formData.email,
+        mobile: formData.mobile,
+        website: formData.website || '',
+        category: formData.category,
+        aboutBrand: formData.aboutBrand || '',
         status: 'pending',
+        submittedAt: new Date().toISOString(),
         adminNotes: '',
         followupNotes: '',
         lastFollowupDate: null,
-        assignee: ''
+        assignee: '',
+        updatedAt: new Date().toISOString()
     };
-    waitlistEntries.push(newEntry);
-    console.log(`📝 Added entry: ${newEntry.brandName} (ID: ${newEntry.id})`);
+    
+    waitlistData.push(newEntry);
     return newEntry;
 };
 
-const getAllEntries = () => {
-    return waitlistEntries;
-};
-
+// Get entry by email
 const getEntryByEmail = (email) => {
-    return waitlistEntries.find(entry => entry.email === email);
+    return waitlistData.find(entry => entry.email === email);
 };
 
+// Get entry by ID
 const getEntryById = (id) => {
-    return waitlistEntries.find(entry => entry.id === parseInt(id));
+    return waitlistData.find(entry => entry.id === id);
 };
 
-const updateEntry = (id, updates) => {
-    const index = waitlistEntries.findIndex(entry => entry.id === parseInt(id));
-    if (index === -1) return null;
+// Get entries with filters
+const getEntriesWithFilters = (filters) => {
+    let filtered = [...waitlistData];
     
-    waitlistEntries[index] = {
-        ...waitlistEntries[index],
-        ...updates,
-        updatedAt: new Date().toISOString()
-    };
-    return waitlistEntries[index];
-};
-
-const getEntriesWithFilters = (filters = {}) => {
-    let filtered = [...waitlistEntries];
-    
-    // Apply date filters
     if (filters.startDate) {
-        const start = new Date(filters.startDate);
-        filtered = filtered.filter(entry => new Date(entry.submittedAt) >= start);
+        filtered = filtered.filter(entry => 
+            new Date(entry.submittedAt) >= new Date(filters.startDate)
+        );
     }
     
     if (filters.endDate) {
-        const end = new Date(filters.endDate);
-        end.setHours(23, 59, 59, 999);
-        filtered = filtered.filter(entry => new Date(entry.submittedAt) <= end);
+        filtered = filtered.filter(entry => 
+            new Date(entry.submittedAt) <= new Date(filters.endDate + 'T23:59:59')
+        );
     }
     
-    // Apply status filter
     if (filters.status && filters.status !== 'all') {
         filtered = filtered.filter(entry => entry.status === filters.status);
     }
     
-    // Apply category filter
     if (filters.category && filters.category !== 'all') {
         filtered = filtered.filter(entry => entry.category === filters.category);
     }
     
-    // Apply search filter
     if (filters.search) {
-        const search = filters.search.toLowerCase();
-        filtered = filtered.filter(entry => 
-            entry.brandName?.toLowerCase().includes(search) ||
-            entry.yourName?.toLowerCase().includes(search) ||
-            entry.email?.toLowerCase().includes(search) ||
-            entry.mobile?.includes(search)
+        const searchLower = filters.search.toLowerCase();
+        filtered = filtered.filter(entry =>
+            entry.brandName.toLowerCase().includes(searchLower) ||
+            entry.yourName.toLowerCase().includes(searchLower) ||
+            entry.email.toLowerCase().includes(searchLower)
         );
     }
     
@@ -85,32 +77,48 @@ const getEntriesWithFilters = (filters = {}) => {
     return filtered;
 };
 
+// Get stats
 const getStats = () => {
-    const total = waitlistEntries.length;
-    const pending = waitlistEntries.filter(e => e.status === 'pending').length;
-    const under_review = waitlistEntries.filter(e => e.status === 'under_review').length;
-    const shortlisted = waitlistEntries.filter(e => e.status === 'shortlisted').length;
-    const invited = waitlistEntries.filter(e => e.status === 'invited').length;
-    const rejected = waitlistEntries.filter(e => e.status === 'rejected').length;
-    
-    return { total, pending, under_review, shortlisted, invited, rejected };
+    const stats = {
+        total: waitlistData.length,
+        pending: waitlistData.filter(e => e.status === 'pending').length,
+        under_review: waitlistData.filter(e => e.status === 'under_review').length,
+        shortlisted: waitlistData.filter(e => e.status === 'shortlisted').length,
+        invited: waitlistData.filter(e => e.status === 'invited').length,
+        rejected: waitlistData.filter(e => e.status === 'rejected').length
+    };
+    return stats;
 };
 
-// Clear all entries (for testing)
-const clearEntries = () => {
-    waitlistEntries = [];
-    idCounter = 1;
-    console.log('🗑️ All entries cleared');
+// Update entry
+const updateEntry = (id, updates) => {
+    const index = waitlistData.findIndex(item => item.id === id);
+    if (index === -1) return null;
+    
+    waitlistData[index] = {
+        ...waitlistData[index],
+        ...updates,
+        updatedAt: new Date().toISOString()
+    };
+    
+    return waitlistData[index];
+};
+
+// 🗑️ DELETE - Delete entry by ID
+const deleteEntry = (id) => {
+    const index = waitlistData.findIndex(item => item.id === id);
+    if (index === -1) return null;
+    
+    const deleted = waitlistData.splice(index, 1)[0];
+    return deleted;
 };
 
 module.exports = {
     addToWaitlist,
-    getAllEntries,
     getEntryByEmail,
     getEntryById,
-    updateEntry,
     getEntriesWithFilters,
     getStats,
-    clearEntries,
-    waitlistEntries // Export for debugging
+    updateEntry,
+    deleteEntry  // NEW
 };

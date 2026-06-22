@@ -434,6 +434,88 @@ const bulkUpdateStatus = (req, res) => {
     }
 };
 
+// 🗑️ DELETE - Delete single entry
+const deleteEntry = (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        // Check if entry exists
+        const entry = waitlistModel.getEntryById(id);
+        if (!entry) {
+            return res.status(404).json({
+                success: false,
+                message: 'Entry not found'
+            });
+        }
+
+        const deleted = waitlistModel.deleteEntry(id);
+        
+        if (!deleted) {
+            return res.status(404).json({
+                success: false,
+                message: 'Failed to delete entry'
+            });
+        }
+
+        console.log(`🗑️ Deleted entry: ${id} - ${entry.brandName}`);
+        res.status(200).json({
+            success: true,
+            message: 'Entry deleted successfully',
+            data: { id, brandName: entry.brandName }
+        });
+    } catch (error) {
+        console.error('❌ Failed to delete entry:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to delete entry',
+            error: error.message
+        });
+    }
+};
+
+// 🗑️ DELETE - Bulk delete entries
+const bulkDeleteEntries = (req, res) => {
+    try {
+        const { ids } = req.body;
+        
+        if (!ids || !Array.isArray(ids) || ids.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'No IDs provided for bulk delete'
+            });
+        }
+
+        let deletedCount = 0;
+        const deletedIds = [];
+        
+        ids.forEach(id => {
+            const entry = waitlistModel.getEntryById(id);
+            if (entry) {
+                const deleted = waitlistModel.deleteEntry(id);
+                if (deleted) {
+                    deletedCount++;
+                    deletedIds.push(id);
+                }
+            }
+        });
+
+        console.log(`🗑️ Bulk deleted ${deletedCount} entries: ${deletedIds.join(', ')}`);
+        res.status(200).json({
+            success: true,
+            message: `${deletedCount} entries deleted successfully`,
+            deletedCount,
+            deletedIds
+        });
+    } catch (error) {
+        console.error('❌ Failed bulk delete:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to delete entries',
+            error: error.message
+        });
+    }
+};
+
 // Export all functions
 module.exports = {
     handleWaitlistSubmission,
@@ -441,5 +523,7 @@ module.exports = {
     getEntryById,
     updateEntryStatus,
     downloadInquiryReport,
-    bulkUpdateStatus
+    bulkUpdateStatus,
+    deleteEntry,        // NEW
+    bulkDeleteEntries   // NEW
 };

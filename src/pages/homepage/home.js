@@ -40,7 +40,7 @@ const Home = () => {
   const [particles, setParticles] = useState([]);
 
   // API URL from environment or default
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5175";
+  const API_URL ="https://api.brandel.shop";
 
   // Generate background particles on mount
   useEffect(() => {
